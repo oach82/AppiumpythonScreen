@@ -1,17 +1,17 @@
-# Credenciales y configuración local
+# Credenciales
 .env
 
-# APKs
+# APKs (se suben a Sauce Labs Storage, no al repo)
 apps/
 
-# Archivos Python compilados
+# Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 .Python
 
-# pytest
+# pytest / hypothesis
 .pytest_cache/
 .hypothesis/
 
@@ -28,3 +28,13 @@ env/
 .idea/
 .vscode/
 *.iml
+
+# Kiro
+.kiro/
+
+# Documentos de validación internos
+VALIDACION_*.md
+
+# Scripts y archivos temporales de generación
+crear_presentacion*.py
+*.pptx
