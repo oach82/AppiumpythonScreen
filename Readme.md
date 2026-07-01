@@ -40,7 +40,13 @@ proyecto/
 │       └── is_displayed.py            # IsDisplayed.element(locator)
 │
 ├── test/
-│   └── test_appiumdemo.py             # Tests usando el Actor
+│   ├── test_appiumdemo.py             # Tests usando el Actor
+│   └── test_bdd.py                    # Step definitions para BDD
+│
+├── features/                          # Archivos Gherkin (.feature)
+│   ├── invoke_search.feature
+│   ├── nesting_tabs.feature
+│   └── isolated_service.feature
 │
 ├── config.py                          # Config solo para Sauce Labs
 ├── conftest.py                        # Fixture: crea el Actor con ability
@@ -134,11 +140,17 @@ Esto solo se hace una vez (o cuando actualices el APK).
 # Activar entorno virtual
 venv\Scripts\activate
 
-# Ejecutar todos los tests
+# Ejecutar tests Screenplay (directos)
 pytest test/test_appiumdemo.py -v --alluredir=allure-results
+
+# Ejecutar tests BDD (Gherkin)
+pytest test/test_bdd.py -v --alluredir=allure-results
 
 # Ejecutar un test específico
 pytest test/test_appiumdemo.py::test_isolated_service_controller -v --alluredir=allure-results
+
+# Ejecutar todos los tests
+pytest test/ -v --alluredir=allure-results
 ```
 
 ---
