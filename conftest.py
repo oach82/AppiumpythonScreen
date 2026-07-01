@@ -10,13 +10,13 @@ from screenplay.actors import Actor
 
 
 @pytest.fixture
-def actor():
+def actor(request):
     """
     Fixture que crea un Actor con la ability de navegar la app en Sauce Labs.
-    Setup: instancia el driver y asigna la ability.
-    Teardown: cierra la sesión del driver.
+    El nombre del test se envía a Sauce Labs como nombre de la sesión.
     """
-    config = Config()
+    test_name = request.node.name.replace("test_", "").replace("_", " ").title()
+    config = Config(test_name=test_name)
     drv = webdriver.Remote(
         command_executor=config.server_url,
         options=config.options

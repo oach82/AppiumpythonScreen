@@ -18,7 +18,7 @@ class Config:
     Lee SAUCE_USERNAME y SAUCE_ACCESS_KEY desde .env.
     """
 
-    def __init__(self):
+    def __init__(self, test_name: str = "AppiumDemo Test"):
         self.username = os.environ.get("SAUCE_USERNAME")
         self.access_key = os.environ.get("SAUCE_ACCESS_KEY")
 
@@ -31,6 +31,7 @@ class Config:
                 "SAUCE_ACCESS_KEY no está definida. Configura la variable en el archivo .env."
             )
 
+        self.test_name = test_name
         self.server_url = SAUCELABS_SERVER_URL
         self.options = self._build_options()
 
@@ -46,7 +47,7 @@ class Config:
             "sauce:options": {
                 "username": self.username,
                 "accessKey": self.access_key,
-                "name": "AppiumDemo - Screenplay",
+                "name": self.test_name,
                 "build": "appium-screenplay-saucelabs",
             }
         })
