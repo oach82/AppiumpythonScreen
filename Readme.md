@@ -40,8 +40,7 @@ proyecto/
 │       └── is_displayed.py            # IsDisplayed.element(locator)
 │
 ├── test/
-│   ├── test_appiumdemo.py             # Tests usando el Actor
-│   └── test_bdd.py                    # Step definitions para BDD
+│   └── test_bdd.py                    # Step definitions (conecta .feature → Screenplay)
 │
 ├── features/                          # Archivos Gherkin (.feature)
 │   ├── invoke_search.feature
@@ -73,11 +72,25 @@ proyecto/
 
 ### Cómo se ve un test
 
+Los escenarios se escriben en Gherkin (`features/*.feature`) y los steps usan el Screenplay:
+
+```gherkin
+# features/invoke_search.feature
+Feature: Búsqueda en ApiDemos
+
+  Scenario: Navegar a Invoke Search, escribir texto y volver al Home
+    Given el actor está en la pantalla Home
+    When navega a App > Search > Invoke Search
+    And escribe "hola" en el campo de búsqueda
+    And vuelve 3 niveles atrás
+    Then la pantalla Home está visible
+```
+
 ```python
-def test_ejemplo(actor):
+# test/test_bdd.py (step definition)
+@when("navega a App > Search > Invoke Search")
+def navega_invoke_search(actor):
     actor.attempts_to(NavigateToInvokeSearch())
-    actor.attempts_to(TypeText.into(CAMPO).the_value("texto"))
-    assert actor.asks(IsDisplayed.element(ELEMENTO))
 ```
 
 ---
@@ -140,16 +153,13 @@ Esto solo se hace una vez (o cuando actualices el APK).
 # Activar entorno virtual
 venv\Scripts\activate
 
-# Ejecutar tests Screenplay (directos)
-pytest test/test_appiumdemo.py -v --alluredir=allure-results
-
-# Ejecutar tests BDD (Gherkin)
+# Ejecutar todos los tests BDD
 pytest test/test_bdd.py -v --alluredir=allure-results
 
-# Ejecutar un test específico
-pytest test/test_appiumdemo.py::test_isolated_service_controller -v --alluredir=allure-results
+# Ejecutar un escenario específico por nombre
+pytest test/test_bdd.py -k "invoke_search" -v --alluredir=allure-results
 
-# Ejecutar todos los tests
+# Ejecutar todos los tests del proyecto
 pytest test/ -v --alluredir=allure-results
 ```
 

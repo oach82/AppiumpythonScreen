@@ -1,108 +1,105 @@
-# Cómo agregar un nuevo caso de prueba (Screenplay)
+# Cómo agregar un nuevo caso de prueba (BDD + Screenplay)
 
 ---
 
-## Paso 1 — Identifica los elementos
+## Paso 1 — Escribe el escenario en Gherkin
 
-Usa **Appium Inspector** o **Layout Inspector** de Android Studio para anotar los `resource-id` y `content-desc` de cada elemento involucrado.
+Crea o edita un archivo `.feature` en `features/`:
+
+```gherkin
+# features/mi_nuevo_caso.feature
+Feature: Mi nueva funcionalidad
+  Como usuario de la app ApiDemos
+  Quiero realizar una acción
+  Para verificar un comportamiento
+
+  Scenario: Descripción del escenario
+    Given el actor está en la pantalla Home
+    When navega a App > Mi Opción
+    And hace click en el botón X
+    Then la pantalla Y está visible
+```
 
 ---
 
-## Paso 2 — ¿Necesitas una nueva Interaction?
+## Paso 2 — Identifica los elementos
 
-Las interactions existentes son:
+Usa **Appium Inspector** para obtener los `resource-id` y `content-desc` de cada elemento.
+
+---
+
+## Paso 3 — ¿Necesitas nuevas Interactions?
+
+Las existentes:
 
 | Interaction | Uso |
 |---|---|
 | `Click.on(locator)` | Click en un elemento |
-| `TypeText.into(locator).the_value(text)` | Escribir texto en un campo |
+| `TypeText.into(locator).the_value(text)` | Escribir texto |
 | `NavigateBack.times(n)` | Presionar Back N veces |
-| `SelectCheckbox.identified_by(locator)` | Activar checkbox si no está marcado |
+| `SelectCheckbox.identified_by(locator)` | Activar checkbox |
 
-Si necesitas algo nuevo (ej: long press, swipe), crea un archivo en `screenplay/interactions/`:
+Si necesitas algo nuevo, crea en `screenplay/interactions/`:
 
 ```python
-# screenplay/interactions/long_press.py
-class LongPress:
+# screenplay/interactions/mi_interaccion.py
+class MiInteraccion:
     def __init__(self, locator):
         self._locator = locator
 
     @staticmethod
     def on(locator):
-        return LongPress(locator)
+        return MiInteraccion(locator)
 
     def perform_as(self, actor):
         element = actor.ability.find(self._locator)
-        # lógica del long press...
+        # tu lógica aquí...
 ```
 
 ---
 
-## Paso 3 — Crea la Task (flujo de navegación)
+## Paso 4 — ¿Necesitas una nueva Task?
 
-Si el nuevo caso necesita navegar a una pantalla nueva, crea un archivo en `screenplay/tasks/`:
+Si hay una navegación nueva, crea en `screenplay/tasks/`:
 
 ```python
 # screenplay/tasks/navigate_to_mi_pantalla.py
 from appium.webdriver.common.appiumby import AppiumBy
 from screenplay.interactions import Click
 
-_OPCION_A = (AppiumBy.ACCESSIBILITY_ID, "Opción A")
-_OPCION_B = (AppiumBy.ACCESSIBILITY_ID, "Opción B")
+_MI_OPCION = (AppiumBy.ACCESSIBILITY_ID, "Mi Opción")
 
 class NavigateToMiPantalla:
     def perform_as(self, actor):
-        actor.attempts_to(
-            Click.on(_OPCION_A),
-            Click.on(_OPCION_B),
-        )
-```
-
-Agrega el import en `screenplay/tasks/__init__.py`:
-```python
-from screenplay.tasks.navigate_to_mi_pantalla import NavigateToMiPantalla
+        actor.attempts_to(Click.on(_MI_OPCION))
 ```
 
 ---
 
-## Paso 4 — ¿Necesitas una nueva Question?
+## Paso 5 — Agrega los step definitions
 
-Si necesitas verificar algo diferente a "está visible", crea en `screenplay/questions/`:
-
-```python
-# screenplay/questions/has_text.py
-class HasText:
-    def __init__(self, locator, expected):
-        self._locator = locator
-        self._expected = expected
-
-    @staticmethod
-    def on(locator, expected):
-        return HasText(locator, expected)
-
-    def answered_by(self, actor):
-        element = actor.ability.find(self._locator)
-        return element.text == self._expected
-```
-
----
-
-## Paso 5 — Escribe el test
-
-En `test/test_appiumdemo.py`:
+En `test/test_bdd.py`, agrega los nuevos steps:
 
 ```python
-@allure.feature("AppiumDemo - Mi Feature")
-@allure.story("Descripción del escenario")
-def test_mi_nuevo_caso(actor):
-    with allure.step("Navegar a la pantalla"):
-        actor.attempts_to(NavigateToMiPantalla())
+# Cargar el nuevo feature
+scenarios("../features/mi_nuevo_caso.feature")
 
-    with allure.step("Realizar la acción"):
-        actor.attempts_to(Click.on(MI_BOTON))
+# Nuevos localizadores
+MI_ELEMENTO = (AppiumBy.ID, "io.appium.android.apis:id/mi_elemento")
 
-    with allure.step("Verificar resultado"):
-        assert actor.asks(IsDisplayed.element(MI_ELEMENTO))
+# Nuevo step WHEN
+@when("navega a App > Mi Opción")
+def navega_mi_opcion(actor):
+    actor.attempts_to(NavigateToMiPantalla())
+
+@when("hace click en el botón X")
+def click_boton_x(actor):
+    actor.attempts_to(Click.on(MI_ELEMENTO))
+
+# Nuevo step THEN
+@then("la pantalla Y está visible")
+def verificar_pantalla_y(actor):
+    assert actor.asks(IsDisplayed.element(MI_ELEMENTO))
 ```
 
 ---
@@ -110,7 +107,7 @@ def test_mi_nuevo_caso(actor):
 ## Paso 6 — Ejecutar
 
 ```bash
-pytest test/test_appiumdemo.py::test_mi_nuevo_caso -v --alluredir=allure-results
+pytest test/test_bdd.py -v --alluredir=allure-results
 ```
 
 ---
@@ -118,15 +115,15 @@ pytest test/test_appiumdemo.py::test_mi_nuevo_caso -v --alluredir=allure-results
 ## Resumen del flujo
 
 ```
-1. Inspeccionar elementos (Appium Inspector)
+1. Escribir escenario en features/*.feature (Gherkin)
        ↓
-2. ¿Nueva interaction? → screenplay/interactions/
+2. Inspeccionar elementos (Appium Inspector)
        ↓
-3. ¿Nueva navegación? → screenplay/tasks/
+3. ¿Nueva interaction? → screenplay/interactions/
        ↓
-4. ¿Nueva verificación? → screenplay/questions/
+4. ¿Nueva navegación? → screenplay/tasks/
        ↓
-5. Escribir test en test/test_appiumdemo.py
+5. Agregar steps en test/test_bdd.py
        ↓
 6. Ejecutar con pytest
 ```
