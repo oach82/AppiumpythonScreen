@@ -4,7 +4,7 @@
 
 ## Paso 1 — Escribe el escenario en Gherkin
 
-Crea o edita un archivo `.feature` en `features/`:
+Crea o edita un archivo `.feature` en `features/`. El nombre del Scenario se usará automáticamente como nombre de la sesión en Sauce Labs.
 
 ```gherkin
 # features/mi_nuevo_caso.feature
@@ -109,6 +109,8 @@ def verificar_pantalla_y(actor):
 ```bash
 pytest test/test_bdd.py -v --alluredir=allure-results
 ```
+
+El nombre del test aparecerá automáticamente en Sauce Labs como nombre de la sesión (derivado del nombre del Scenario en el `.feature`).
 
 ---
 

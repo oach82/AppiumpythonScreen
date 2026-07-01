@@ -12,8 +12,10 @@ Suite de automatización móvil Android con Appium y Python, estructurada bajo e
 | Appium 2.x | Automatización móvil |
 | UIAutomator2 | Driver Android |
 | pytest | Framework de pruebas |
+| pytest-bdd | BDD con archivos .feature (Gherkin) |
 | allure-pytest | Reportes con evidencia visual |
 | python-dotenv | Credenciales via `.env` |
+| requests | Subir APK al storage de Sauce Labs |
 | Sauce Labs (us-west-1) | Ejecución en la nube |
 
 ---
@@ -178,3 +180,25 @@ allure serve allure-results
 1. Entra a https://app.saucelabs.com
 2. Ve a **Automated → Test Results**
 3. Filtra por build: `appium-screenplay-saucelabs`
+4. Cada sesión aparece con el nombre del escenario del `.feature` (ej: "Navegar A Invoke Search Escribir Texto Y Volver Al Home")
+
+---
+
+## Flujo completo del proyecto
+
+```
+features/*.feature          → Escenarios en lenguaje natural (Gherkin)
+       ↓
+test/test_bdd.py            → Step definitions (Given/When/Then → Screenplay)
+       ↓
+screenplay/tasks/           → Flujos de navegación de alto nivel
+screenplay/interactions/    → Acciones atómicas (Click, Type, Back, Checkbox)
+screenplay/questions/       → Verificaciones (IsDisplayed)
+       ↓
+screenplay/abilities/       → BrowseTheWeb (wrapper del driver Appium)
+screenplay/actors/          → Actor que ejecuta todo
+       ↓
+config.py + conftest.py     → Conexión a Sauce Labs con nombre dinámico
+       ↓
+Sauce Labs (us-west-1)      → Ejecución en la nube con video, logs y screenshots
+```
