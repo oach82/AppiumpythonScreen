@@ -6,6 +6,6 @@ Feature: Búsqueda en ApiDemos
   Scenario: Navegar a Invoke Search, escribir texto y volver al Home
     Given el actor está en la pantalla Home
     When navega a App > Search > Invoke Search
-    And escribe "hola" en el campo de búsqueda
+    And escribe "oscar" en el campo de búsqueda
     And vuelve 3 niveles atrás
     Then la pantalla Home está visible

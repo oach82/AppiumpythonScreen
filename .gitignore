@@ -1,8 +1,8 @@
 # Credenciales
 .env
 
-# APKs (se suben a Sauce Labs Storage, no al repo)
-apps/
+# APKs — se suben al repo y también a Sauce Labs Storage
+# apps/
 
 # Python
 __pycache__/
